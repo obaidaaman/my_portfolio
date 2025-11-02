@@ -56,7 +56,7 @@ class _DescriptionDevState extends State<DescriptionDev> {
             blendMode: BlendMode.srcATop,
             child: Image.asset(
               height: MediaQuery.of(context).size.height / 2.6,
-              'assets/samar.jpg',
+              'assets/Profile_img.png',
               width: MediaQuery.of(context).size.width / 2.7,
             ),
           )
