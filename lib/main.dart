@@ -5,8 +5,6 @@
   - API integration for real-time responses
   - Auto-scroll to contact section
 */
-
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -44,7 +42,6 @@ List<String> navTitles = [
   "Skills",
   "Projects",
   "Contact",
-  "Blog",
 ];
 
 List<IconData> navIcons = [
@@ -607,13 +604,11 @@ List<ProjectUtils> hobbyProjects = [];
 
 List<ProjectUtils> workProjects = [
   ProjectUtils(
-      image: "assets/projects/logo.png",
-      title: 'PatronOS',
+      image: "assets/projects/lynn.png",
+      title: 'Lynn Concierge',
       subtitle:
-          'PatronOS is a digital home concierge system for UHNIs by Pinch. BERT AI chatbot with real context and access to real world tools(web search, amazon,flight&hotels) and ability to escalate request to Human Lifestyle Manager.',
-      IosLink: 'https://apps.apple.com/in/app/patronos/id6749004848',
-      androidLink:
-          'https://play.google.com/store/apps/details?id=com.fleksa.payperse_app&hl=en&pli=1'),
+          'Lynn, a WhatsApp-based AI concierge that manages your everyday tasks. It handles end-to-end lifestyle services through an intelligent automation layer connecting with real-world tools to fulfill requests and bring in a Human Concierge for complex tasks, ensuring the service remains reliable and personally guided.',
+      webLink: 'https://concierge.pinch.co.in/lynn'),
   ProjectUtils(
       image: "assets/projects/real_estate.png",
       title: 'Prime View',
@@ -679,18 +674,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _scrollController = ScrollController();
-  final GlobalKey _contactSectionKey = GlobalKey();
 
-  void _scrollToContact() {
-    final context = _contactSectionKey.currentContext;
-    if (context != null) {
-      Scrollable.ensureVisible(
-        context,
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
+  // 1. Create Keys for each section
+  final List<GlobalKey> navbarKeys = List.generate(5, (index) => GlobalKey());
 
   @override
   void dispose() {
@@ -698,12 +684,34 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  // 2. Logic to scroll to a specific key
+  void scrollToSection(int navIndex) {
+    if (navIndex == 4) {
+      // Blog Section (Link to external URL Example)
+      // js.context.callMethod('open', ['https://your-blog-url.com']);
+      return;
+    }
+
+    final key = navbarKeys[navIndex];
+    Scrollable.ensureVisible(
+      key.currentContext!,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
         key: scaffoldKey,
-        endDrawer: constraints.maxWidth <= 600 ? const CustomDrawer() : null,
+        // Update Drawer to pass the function
+        endDrawer: constraints.maxWidth <= 600
+            ? CustomDrawer(onNavItemTap: (int navIndex) {
+                scaffoldKey.currentState?.closeEndDrawer();
+                scrollToSection(navIndex);
+              })
+            : null,
         backgroundColor: CustomColor.scaffoldBg,
         body: Stack(
           children: [
@@ -711,17 +719,28 @@ class _HomePageState extends State<HomePage> {
               controller: _scrollController,
               child: Column(
                 children: [
+                  // Header
                   constraints.maxWidth <= 600
                       ? HeaderMobile(
                           onMenuTap: () {
                             scaffoldKey.currentState?.openEndDrawer();
                           },
                         )
-                      : const HeaderDesktop(),
-                  constraints.maxWidth >= kMinDesktopWidth
-                      ? DescriptionDev(onGetInTouch: _scrollToContact)
-                      : DescDevMobile(onGetInTouch: _scrollToContact),
+                      : HeaderDesktop(onNavMenuTap: (int navIndex) {
+                          scrollToSection(navIndex);
+                        }),
+
+                  // HOME (Index 0)
                   Container(
+                    key: navbarKeys[0], // Assign Key 0
+                    child: constraints.maxWidth >= kMinDesktopWidth
+                        ? DescriptionDev(onGetInTouch: () => scrollToSection(3))
+                        : DescDevMobile(onGetInTouch: () => scrollToSection(3)),
+                  ),
+
+                  // SKILLS (Index 1)
+                  Container(
+                    key: navbarKeys[1], // Assign Key 1
                     color: CustomColor.bgLight1,
                     width: MediaQuery.of(context).size.width,
                     padding: const EdgeInsets.fromLTRB(25, 20, 25, 60),
@@ -743,10 +762,22 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-                  const ProjectSection(),
-                  ContactSection(key: _contactSectionKey),
+
+                  // PROJECTS (Index 2)
+                  Container(
+                    key: navbarKeys[2], // Assign Key 2
+                    child: const ProjectSection(),
+                  ),
+
+                  // CONTACT (Index 3)
+                  Container(
+                    key: navbarKeys[3], // Assign Key 3
+                    child: const ContactSection(),
+                  ),
+
+                  // Footer
                   const SizedBox(height: 20),
-                  Footer()
+                  const Footer()
                 ],
               ),
             ),
@@ -768,7 +799,7 @@ class Footer extends StatelessWidget {
     return Container(
       width: double.maxFinite,
       height: 100,
-      child: Text(
+      child: const Text(
           textAlign: TextAlign.center,
           "Made by Aman Obaid\nAll rights reserved"),
     );
@@ -840,14 +871,10 @@ class ContactSection extends StatelessWidget {
   }
 }
 
-class CustomDrawer extends StatefulWidget {
-  const CustomDrawer({super.key});
+class CustomDrawer extends StatelessWidget {
+  const CustomDrawer({super.key, required this.onNavItemTap});
+  final Function(int) onNavItemTap; // Add this callback
 
-  @override
-  State<CustomDrawer> createState() => _CustomDrawerState();
-}
-
-class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -868,7 +895,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     return ListTile(
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 30),
-                      onTap: () {},
+                      onTap: () {
+                        onNavItemTap(index); // Trigger callback
+                      },
                       titleTextStyle: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
@@ -999,37 +1028,35 @@ class DescDevMobile extends StatelessWidget {
   }
 }
 
-class HeaderDesktop extends StatefulWidget {
-  const HeaderDesktop({super.key});
+class HeaderDesktop extends StatelessWidget {
+  const HeaderDesktop({super.key, required this.onNavMenuTap});
+  final Function(int) onNavMenuTap; // Add this callback
 
-  @override
-  State<HeaderDesktop> createState() => _HeaderDesktopState();
-}
-
-class _HeaderDesktopState extends State<HeaderDesktop> {
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 60,
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       width: double.maxFinite,
       decoration: BoxDecoration(
           color: Colors.blueGrey,
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
               colors: [Colors.transparent, CustomColor.bgLight1]),
           borderRadius: BorderRadius.circular(80)),
       child: Row(
         children: [
           SiteLogo(onTap: () {}),
-          Spacer(),
+          const Spacer(),
           for (int i = 0; i < navTitles.length; i++)
             Padding(
               padding: const EdgeInsets.only(right: 20),
               child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    onNavMenuTap(i); // Trigger the callback with index
+                  },
                   child: Text(
                     navTitles[i],
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: CustomColor.whitePrimary),
@@ -1076,7 +1103,7 @@ class ProjectCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       clipBehavior: Clip.antiAlias,
-      height: 320,
+      height: 332,
       width: 260,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10), color: CustomColor.bgLight2),
@@ -1091,18 +1118,19 @@ class ProjectCardWidget extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(12, 15, 12, 10),
+            padding: const EdgeInsets.fromLTRB(12, 15, 12, 10),
             child: Text(
               project.title,
-              style: TextStyle(
+              style: const TextStyle(
                   fontWeight: FontWeight.w600, color: CustomColor.whitePrimary),
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(12, 0, 12, 12),
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
             child: Text(
               project.subtitle,
-              style: TextStyle(color: CustomColor.whiteSecondary, fontSize: 10),
+              style: const TextStyle(
+                  color: CustomColor.whiteSecondary, fontSize: 10),
             ),
           ),
           const Spacer(),
@@ -1119,6 +1147,8 @@ class ProjectCardWidget extends StatelessWidget {
                       fontWeight: FontWeight.w400),
                 ),
                 const Spacer(),
+
+                // 1. Check for iOS Link
                 if (project.IosLink != null)
                   InkWell(
                     onTap: () {
@@ -1126,27 +1156,32 @@ class ProjectCardWidget extends StatelessWidget {
                     },
                     child: Image.asset('assets/ios_icon.png', width: 16),
                   ),
-                project.androidLink != null
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 6),
-                        child: InkWell(
-                          onTap: () {
-                            js.context
-                                .callMethod("open", [project.androidLink]);
-                          },
-                          child:
-                              Image.asset('assets/android_icon.png', width: 17),
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.only(left: 6),
-                        child: InkWell(
-                          onTap: () {
-                            js.context.callMethod("open", [project.githubLink]);
-                          },
-                          child: Image.asset('assets/github.png', width: 17),
-                        ),
-                      ),
+
+                // 2. Check for Android Link
+                if (project.androidLink != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 6),
+                    child: InkWell(
+                      onTap: () {
+                        js.context.callMethod("open", [project.androidLink]);
+                      },
+                      child: Image.asset('assets/android_icon.png', width: 17),
+                    ),
+                  ),
+
+                // 3. Check for Github Link (Only shows if link exists)
+                if (project.githubLink != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 6),
+                    child: InkWell(
+                      onTap: () {
+                        js.context.callMethod("open", [project.githubLink]);
+                      },
+                      child: Image.asset('assets/github.png', width: 17),
+                    ),
+                  ),
+
+                // 4. Check for Web Link
                 if (project.webLink != null)
                   Padding(
                     padding: const EdgeInsets.only(left: 6),
