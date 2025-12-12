@@ -7,6 +7,7 @@
 */
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher_web/url_launcher_web.dart';
@@ -833,33 +834,90 @@ class ContactSection extends StatelessWidget {
               children: [
                 for (int i = 0; i < socialHandles.length; i++)
                   Container(
-                    width: 200,
+                    width: 250, // Increased width slightly to fit email text
                     decoration: BoxDecoration(
                         color: CustomColor.bgLight2,
                         borderRadius: BorderRadius.circular(5)),
                     child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 5),
+                      leading: Image.asset(
+                        socialHandles[i].socialHandleImage,
+                        width: 26,
+                      ),
+                      // 1. Show the Name
+                      title: Text(socialHandles[i].socialHandleName),
+
+                      // 2. Show the Email/Link visibly
+                      subtitle: Text(
+                        socialHandles[i].socialHandleLink,
+                        style: const TextStyle(
+                            fontSize: 12, color: CustomColor.whiteSecondary),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      // 3. Add Copy Button on the side
+                      trailing: IconButton(
+                        icon: const Icon(Icons.content_copy,
+                            size: 20, color: CustomColor.yellowPrimary),
+                        tooltip: 'Copy to clipboard',
+                        onPressed: () {
+                          // Copy logic
+                          Clipboard.setData(ClipboardData(
+                              text: socialHandles[i].socialHandleLink));
+
+                          // Show Feedback
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  '${socialHandles[i].socialHandleName} copied to clipboard!'),
+                              backgroundColor: CustomColor.yellowPrimary,
+                              behavior: SnackBarBehavior.floating,
+                              duration: const Duration(seconds: 2),
+                              width: 300,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              action: SnackBarAction(
+                                label: 'OK',
+                                textColor: Colors.black,
+                                onPressed: () {},
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+
+                      // 4. Main Tap Logic (Keep existing behavior as backup)
                       onTap: () async {
                         if (socialHandles[i].socialHandleName == 'Gmail') {
                           final Uri emailUri = Uri(
                               scheme: 'mailto',
                               path: socialHandles[i].socialHandleLink,
-                              queryParameters: {'subject': ''});
-                          if (await canLaunchUrl(
-                              Uri.parse(emailUri.toString()))) {
-                            await launchUrl(Uri.parse(emailUri.toString()));
+                              queryParameters: {
+                                'subject': 'Inquiry from Portfolio'
+                              });
+                          try {
+                            if (await canLaunchUrl(emailUri)) {
+                              await launchUrl(emailUri);
+                            } else {
+                              // If mailto fails, fallback to copy
+                              Clipboard.setData(ClipboardData(
+                                  text: socialHandles[i].socialHandleLink));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Could not launch mail app. Email copied instead!')),
+                              );
+                            }
+                          } catch (e) {
+                            print(e);
                           }
                         } else {
+                          // Open other links
                           js.context.callMethod(
                               "open", [socialHandles[i].socialHandleLink]);
                         }
                       },
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      leading: Image.asset(
-                        socialHandles[i].socialHandleImage,
-                        width: 26,
-                      ),
-                      title: Text(socialHandles[i].socialHandleName),
                     ),
                   ),
               ],
@@ -934,7 +992,7 @@ class _DescriptionDevState extends State<DescriptionDev> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "Hi, \nI'm Aman Obaid\nA Software Developer Engineer",
+                "Hi, \nI'm Aman Obaid\nA Software Development Engineer",
                 style: TextStyle(
                     fontSize: 24,
                     height: 1.5,
