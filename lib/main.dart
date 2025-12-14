@@ -1,12 +1,4 @@
-/*
-  Enhanced portfolio with Ava Chatbot integration
-  - Floating chat button with animated icon
-  - Chat interface with message history
-  - API integration for real-time responses
-  - Auto-scroll to contact section
-*/
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -601,6 +593,20 @@ class ProjectUtils {
   });
 }
 
+// Helper function to open the Resume
+Future<void> openResume() async {
+  // Replace 'assets/cv.pdf' with the exact path to your file
+  final Uri uri = Uri.parse('assets/projects/resume_amanobaid.pdf');
+
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  } else {
+    // Fallback: If local asset launch fails (common in some web deployments),
+    // you might need to upload the PDF to Google Drive/Dropbox and put that link here.
+    print("Could not launch resume");
+  }
+}
+
 List<ProjectUtils> hobbyProjects = [];
 
 List<ProjectUtils> workProjects = [
@@ -992,24 +998,69 @@ class _DescriptionDevState extends State<DescriptionDev> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "Hi, \nI'm Aman Obaid\nA Software Development Engineer",
+                "Hi, \nI am Aman Obaid",
                 style: TextStyle(
                     fontSize: 24,
                     height: 1.5,
                     fontWeight: FontWeight.bold,
                     color: CustomColor.whitePrimary),
               ),
+              const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "A ",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: CustomColor
+                          .whitePrimary, // or CustomColor.yellowPrimary if you want it yellow
+                    ),
+                  ),
+                  ChangingText(),
+                ],
+              ),
               const SizedBox(height: 10),
-              SizedBox(
-                  width: 250,
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue),
-                      onPressed: widget.onGetInTouch,
-                      child: const Text(
-                        'Get in touch',
-                        style: TextStyle(color: Colors.white),
-                      ))),
+              Row(
+                children: [
+                  SizedBox(
+                      width: 250,
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: CustomColor.yellowPrimary),
+                          onPressed: widget.onGetInTouch,
+                          child: const Text(
+                            'Get in touch',
+                            style: TextStyle(color: Colors.black),
+                          ))),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  SizedBox(
+                    height: 45,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          side: const BorderSide(
+                              color: CustomColor.yellowPrimary, width: 2),
+                          foregroundColor: CustomColor.whitePrimary,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50))),
+                      onPressed: () {
+                        // Call the download function here
+                        js.context.callMethod('open', ['resume_amanobaid.pdf']);
+                      },
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.download, size: 18),
+                          SizedBox(width: 5),
+                          Text('Download resume'),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ],
           ),
           ShaderMask(
@@ -1064,7 +1115,7 @@ class DescDevMobile extends StatelessWidget {
           ),
           const SizedBox(height: 30),
           const Text(
-            "Hi,\nI'm Aman Obaid\nA Software Developer Engineer",
+            "Hi,\nI am Aman Obaid",
             style: TextStyle(
               fontSize: 24,
               height: 1.5,
@@ -1072,13 +1123,64 @@ class DescDevMobile extends StatelessWidget {
               color: CustomColor.whitePrimary,
             ),
           ),
+          const Row(
+            children: [
+              Text(
+                "A ",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: CustomColor.whitePrimary,
+                ),
+              ),
+              Expanded(
+                  child:
+                      ChangingText()), // Expanded helps prevent overflow on very small screens
+            ],
+          ),
           const SizedBox(height: 15),
-          SizedBox(
-            width: 190.0,
-            child: ElevatedButton(
-              onPressed: onGetInTouch,
-              child: const Text("Get in touch"),
-            ),
+          Wrap(
+            runSpacing: 15, // Space between lines if they wrap
+            spacing: 15, // Space between buttons
+            children: [
+              SizedBox(
+                width: 160.0,
+                height: 45,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: CustomColor.yellowPrimary,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50))),
+                  onPressed: onGetInTouch,
+                  child: const Text("Get in touch"),
+                ),
+              ),
+              SizedBox(
+                width: 185.0,
+                height: 45,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                          color: CustomColor.yellowPrimary, width: 2),
+                      foregroundColor: CustomColor.whitePrimary,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50))),
+                  onPressed: () {
+                    // Call the download function here
+                    js.context.callMethod('open', ['resume_amanobaid.pdf']);
+                  },
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.download, size: 18),
+                      SizedBox(width: 5),
+                      Text("Download resume"),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           )
         ],
       ),
@@ -1137,16 +1239,16 @@ class HeaderMobile extends StatelessWidget {
       height: 50,
       decoration: BoxDecoration(
           color: Colors.blueGrey,
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
               colors: [Colors.transparent, CustomColor.bgLight1]),
           borderRadius: BorderRadius.circular(80)),
-      margin: EdgeInsets.fromLTRB(40, 5, 20, 5),
+      margin: const EdgeInsets.fromLTRB(40, 5, 20, 5),
       child: Row(
         children: [
           SiteLogo(onTap: onLogoTap),
-          Spacer(),
-          IconButton(onPressed: onMenuTap, icon: Icon(Icons.menu)),
-          SizedBox(width: 15)
+          const Spacer(),
+          IconButton(onPressed: onMenuTap, icon: const Icon(Icons.menu)),
+          const SizedBox(width: 15)
         ],
       ),
     );
@@ -1414,6 +1516,209 @@ class SkilsMobile extends StatelessWidget {
             ],
           )
         ],
+      ),
+    );
+  }
+}
+
+class TypingTitle extends StatefulWidget {
+  const TypingTitle({super.key});
+
+  @override
+  State<TypingTitle> createState() => _TypingTitleState();
+}
+
+class _TypingTitleState extends State<TypingTitle>
+    with SingleTickerProviderStateMixin {
+  // List of strings to display
+  final List<String> _titles = [
+    "Software Development Engineer",
+    "GenAI Engineer",
+  ];
+  int _currentIndex = 0;
+  String _displayText = "";
+  bool _isDeleting = false;
+
+  late AnimationController _controller;
+  late Animation<int> _textAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration:
+          const Duration(milliseconds: 2000), // Base duration for one cycle
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          // If typing is complete, wait for a moment then start deleting
+          if (!_isDeleting) {
+            Future.delayed(const Duration(milliseconds: 1500), () {
+              setState(() {
+                _isDeleting = true;
+                _controller.reset();
+                _controller.duration = const Duration(
+                    milliseconds: 800); // Shorter duration for deletion
+                _controller.forward();
+              });
+            });
+          } else {
+            // If deleting is complete, move to the next title
+            _currentIndex = (_currentIndex + 1) % _titles.length;
+            setState(() {
+              _isDeleting = false;
+              _controller.reset();
+              _controller.duration =
+                  const Duration(milliseconds: 2000); // Back to typing duration
+              _controller.forward();
+            });
+          }
+        }
+      });
+
+    // Initial setup for the animation
+    _setupAnimation();
+    _controller.forward();
+  }
+
+  void _setupAnimation() {
+    final targetTitle = _titles[_currentIndex];
+    final targetLength = targetTitle.length;
+
+    // Animate the length of the string to create the typing effect
+    _textAnimation = IntTween(
+      begin: _isDeleting ? targetLength : 0,
+      end: _isDeleting ? 0 : targetLength,
+    ).animate(_controller)
+      ..addListener(() {
+        final currentLength = _textAnimation.value;
+        setState(() {
+          _displayText = targetTitle.substring(0, currentLength);
+        });
+      });
+  }
+
+  @override
+  void didUpdateWidget(covariant TypingTitle oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _setupAnimation();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          // Static prefix text
+          const TextSpan(
+            text: 'A ',
+            style: TextStyle(
+              fontSize: 24,
+              height: 1.5,
+              fontWeight: FontWeight.bold,
+              color: CustomColor.whitePrimary,
+            ),
+          ),
+          // Dynamic typing text
+          TextSpan(
+            text: _displayText,
+            style: const TextStyle(
+              fontSize: 24,
+              height: 1.5,
+              fontWeight: FontWeight.bold,
+              color:
+                  CustomColor.yellowPrimary, // Use your accent color for effect
+            ),
+          ),
+          // Blinking cursor
+          const TextSpan(
+            text: '|',
+            style: TextStyle(
+              fontSize: 24,
+              height: 1.5,
+              fontWeight: FontWeight.bold,
+              color: CustomColor.whitePrimary,
+            ),
+          ),
+        ],
+      ),
+      style: const TextStyle(
+        fontSize: 24,
+        height: 1.5,
+        fontWeight: FontWeight.bold,
+        color: CustomColor.whitePrimary,
+      ),
+    );
+  }
+}
+
+class ChangingText extends StatefulWidget {
+  const ChangingText({super.key});
+
+  @override
+  State<ChangingText> createState() => _ChangingTextState();
+}
+
+class _ChangingTextState extends State<ChangingText> {
+  final List<String> _texts = [
+    "Software Development Engineer",
+    "GenAI Engineer",
+  ];
+
+  int _textIndex = 0;
+  String _currentText = "";
+  bool _isDeleting = false;
+  Duration _typingSpeed = const Duration(milliseconds: 150);
+
+  @override
+  void initState() {
+    super.initState();
+    _animate();
+  }
+
+  void _animate() async {
+    final String fullText = _texts[_textIndex];
+
+    setState(() {
+      if (_isDeleting) {
+        // Remove a character
+        _currentText = fullText.substring(0, _currentText.length - 1);
+        _typingSpeed = const Duration(milliseconds: 30);
+      } else {
+        // Add a character
+        _currentText = fullText.substring(0, _currentText.length + 1);
+        _typingSpeed = const Duration(milliseconds: 50);
+      }
+    });
+
+    // Logic to switch states
+    if (!_isDeleting && _currentText == fullText) {
+      // Pause at the end of the word
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) setState(() => _isDeleting = true);
+    } else if (_isDeleting && _currentText == "") {
+      _isDeleting = false;
+      _textIndex = (_textIndex + 1) % _texts.length;
+    }
+
+    await Future.delayed(_typingSpeed);
+    if (mounted) _animate();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      _currentText,
+      style: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: CustomColor.yellowPrimary, // Contrast color for the effect
       ),
     );
   }
