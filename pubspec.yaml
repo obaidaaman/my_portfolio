@@ -21,6 +21,8 @@ dependencies:
   url_launcher: ^6.3.0
   http: ^1.1.0
   uuid: ^4.0.0
+  google_fonts: ^6.1.0
+  flutter_animate: ^4.5.0
 
 dev_dependencies:
   flutter_test:

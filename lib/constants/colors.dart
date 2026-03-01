@@ -10,4 +10,5 @@ class CustomColor {
   static const Color yellowPrimary = Color(0xffFFAF29);
   static const Color whitePrimary = Color(0xffEAEAEB);
   static const Color whiteSecondary = Color(0xffC8C9CE);
+  static const Color aiAccent = Color(0xFF7B61FF);
 }
