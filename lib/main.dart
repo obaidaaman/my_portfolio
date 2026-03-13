@@ -524,10 +524,19 @@ const _projects = [
     title: 'GrabPic',
     description:
         'AI-powered event photo retrieval using facial recognition and vector search. Attendees selfie to instantly find themselves across thousands of event photos.',
-    tag: 'AI/ML',
+    tag: 'GenAI',
     tagColor: C.accent,
     chips: ['FastAPI', 'Redis Queue', 'Vector Search', 'JWT'],
     github: 'https://github.com/obaidaaman/GrabPic',
+  ),
+  Project(
+    title: 'Agentic Blogger',
+    description:
+        'An Agentic AI blogging pipeline built using LangGraph, FastAPI, and structured LLM outputs. The system generates complete blog posts from a topic by orchestrating multiple AI agents including routing, research, planning, parallel section generation, and image generation.',
+    tag: 'GenAI',
+    tagColor: C.accent,
+    chips: ['FastAPI', 'LangGraph', 'Vector Search', 'API'],
+    github: 'https://github.com/obaidaaman/AgenticBlogger',
   ),
   Project(
     title: 'Personal AI Bot (Ava)',
@@ -537,15 +546,6 @@ const _projects = [
     tagColor: C.purple,
     chips: ['LangChain', 'RAG', 'LangSmith', 'FastAPI'],
     github: 'https://github.com/obaidaaman/PersonalAIBot',
-  ),
-  Project(
-    title: 'Prime View',
-    description:
-        'Luxury real estate web app with immersive property exploration, sleek UI, and curated listings for high-end urban and serene properties.',
-    tag: 'Web',
-    tagColor: C.warning,
-    chips: ['React', 'Vercel', 'REST API', 'Responsive'],
-    web: 'https://primeview-realestate.vercel.app/',
   ),
   Project(
     title: 'Property Maintenance System',
@@ -906,6 +906,11 @@ class _HeroContent extends StatelessWidget {
       Wrap(spacing: 14, runSpacing: 14, children: [
         _PrimaryBtn('Get In Touch', Icons.arrow_forward_rounded, onContact),
         _OutlineBtn(
+            'Resume',
+            Icons.download_rounded,
+            () => js.context
+                .callMethod('open', ['assets/Resume_Aman_Obaid.pdf'])),
+        _OutlineBtn(
             'GitHub',
             Icons.code_rounded,
             () => js.context
@@ -979,7 +984,7 @@ class _HeroCard extends StatelessWidget {
         const SizedBox(height: 20),
         Container(height: 1, color: C.border),
         const SizedBox(height: 16),
-        // Tech stack mini chips
+
         Text('Core Stack', style: mono(color: C.textDim, size: 11)),
         const SizedBox(height: 10),
         Wrap(spacing: 6, runSpacing: 6, children: [
