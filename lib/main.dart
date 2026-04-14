@@ -1730,7 +1730,7 @@ class _ContactCardState extends State<_ContactCard> {
               ]),
             ),
             const SizedBox(height: 8),
-            // Copy button — stopPropagation via separate GestureDetector with HitTestBehavior
+
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
@@ -1764,7 +1764,6 @@ class _ContactCardState extends State<_ContactCard> {
     );
   }
 }
-// ─── FOOTER ──────────────────────────────────────────────────────────────────
 
 class _Footer extends StatelessWidget {
   const _Footer();
@@ -1791,8 +1790,6 @@ class _Footer extends StatelessWidget {
     );
   }
 }
-
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
 
 class _SectionLabel extends StatelessWidget {
   final String text;
