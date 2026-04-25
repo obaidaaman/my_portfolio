@@ -9,49 +9,52 @@ import 'package:uuid/uuid.dart';
 // ─── THEME ───────────────────────────────────────────────────────────────────
 
 class C {
-  static const Color bg = Color(0xff0A0B0F);
-  static const Color surface = Color(0xff111318);
-  static const Color card = Color(0xff161A23);
-  static const Color cardHover = Color(0xff1C2030);
-  static const Color border = Color(0xff252B3B);
-  static const Color accent = Color(0xff00E5FF); // electric cyan
-  static const Color accentDim = Color(0xff0097A7);
-  static const Color accentGlow = Color(0x2200E5FF);
-  static const Color purple = Color(0xff7C3AED);
-  static const Color purpleGlow = Color(0x227C3AED);
-  static const Color text = Color(0xffF0F4FF);
-  static const Color textMuted = Color(0xff8892A4);
-  static const Color textDim = Color(0xff4A5568);
-  static const Color success = Color(0xff22D3A0);
-  static const Color warning = Color(0xffFFA726);
+  static const Color bg = Color(0xff07090F);
+  static const Color surface = Color(0xff0C0F18);
+  static const Color card = Color(0xff111520);
+  static const Color cardHover = Color(0xff161B2A);
+  static const Color border = Color(0xff1E2438);
+  static const Color borderHi = Color(0xff2E3A55);
+
+  // Single accent — cool steel blue, no purple, no pink
+  static const Color accent = Color(0xff4F7EF8);
+  static const Color accentLo = Color(0xff2B4FA8);
+  static const Color accentGlow = Color(0x194F7EF8);
+
+  static const Color text = Color(0xffE4EAF6);
+  static const Color textMuted = Color(0xff6B7A99);
+  static const Color textDim = Color(0xff343D54);
+
+  static const Color green = Color(0xff2EB87A); // success / available
+  static const Color amber = Color(0xffD4921C); // warning
 }
 
-TextStyle heading1({Color color = C.text}) => TextStyle(
+TextStyle h1({Color c = C.text}) => TextStyle(
     fontFamily: 'monospace',
-    fontSize: 48,
+    fontSize: 52,
     fontWeight: FontWeight.w800,
-    color: color,
+    color: c,
     letterSpacing: -1.5,
-    height: 1.1);
+    height: 1.08);
 
-TextStyle heading2({Color color = C.text}) => TextStyle(
+TextStyle h2({Color c = C.text}) => TextStyle(
     fontFamily: 'monospace',
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: FontWeight.w700,
-    color: color,
-    letterSpacing: -0.5);
+    color: c,
+    letterSpacing: -0.4);
 
-TextStyle heading3({Color color = C.text}) => TextStyle(
+TextStyle h3({Color c = C.text}) => TextStyle(
     fontFamily: 'monospace',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: FontWeight.w600,
-    color: color);
+    color: c);
 
-TextStyle body({Color color = C.text}) =>
-    TextStyle(fontSize: 15, color: color, height: 1.7);
+TextStyle body({Color c = C.text}) =>
+    TextStyle(fontSize: 14.5, color: c, height: 1.75, fontFamily: 'sans-serif');
 
-TextStyle mono({Color color = C.accent, double size = 13}) => TextStyle(
-    fontFamily: 'monospace', fontSize: size, color: color, letterSpacing: 0.5);
+TextStyle label({Color c = C.accent, double sz = 12}) => TextStyle(
+    fontFamily: 'monospace', fontSize: sz, color: c, letterSpacing: 0.4);
 
 // ─── CHAT ────────────────────────────────────────────────────────────────────
 
@@ -109,14 +112,14 @@ class _AvaChatbotState extends State<AvaChatbot>
     final id = const Uuid().v4();
     _svc = ChatService(threadId: id);
     _anim = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 350));
+        vsync: this, duration: const Duration(milliseconds: 300));
     _scaleAnim = CurvedAnimation(parent: _anim, curve: Curves.easeOutBack);
     _messages.add(ChatMessage(
       message:
           "Hi! I'm Ava, Aman's AI assistant. Ask me anything about his work, skills, or experience!",
       isUser: false,
     ));
-    Future.delayed(const Duration(seconds: 8), () {
+    Future.delayed(const Duration(seconds: 7), () {
       if (mounted) setState(() => _showPopup = false);
     });
   }
@@ -166,7 +169,6 @@ class _AvaChatbotState extends State<AvaChatbot>
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
-      // Chat window
       if (_isOpen)
         Positioned(
           right: 24,
@@ -179,13 +181,17 @@ class _AvaChatbotState extends State<AvaChatbot>
               height: 520,
               decoration: BoxDecoration(
                 color: C.card,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: C.accent.withOpacity(0.3)),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: C.borderHi),
                 boxShadow: [
                   BoxShadow(
-                      color: C.accent.withOpacity(0.15),
+                      color: Colors.black.withOpacity(0.5),
                       blurRadius: 40,
-                      spreadRadius: -5)
+                      spreadRadius: -8),
+                  BoxShadow(
+                      color: C.accent.withOpacity(0.08),
+                      blurRadius: 60,
+                      spreadRadius: -10),
                 ],
               ),
               child: Column(children: [
@@ -196,30 +202,29 @@ class _AvaChatbotState extends State<AvaChatbot>
                   decoration: BoxDecoration(
                     color: C.surface,
                     borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(20)),
+                        const BorderRadius.vertical(top: Radius.circular(16)),
                     border: Border(bottom: BorderSide(color: C.border)),
                   ),
                   child: Row(children: [
-                    _AvaAvatar(size: 36),
+                    _AvaAvatar(size: 34),
                     const SizedBox(width: 10),
                     Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Ava', style: heading3()),
+                          Text('Ava', style: h3()),
                           Row(children: [
                             Container(
-                                width: 7,
-                                height: 7,
-                                decoration: BoxDecoration(
-                                    color: C.success, shape: BoxShape.circle)),
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                    color: C.green, shape: BoxShape.circle)),
                             const SizedBox(width: 5),
-                            Text('Online',
-                                style: mono(color: C.success, size: 11)),
+                            Text('Online', style: label(c: C.green, sz: 10)),
                           ])
                         ]),
                     const Spacer(),
                     IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 20),
+                        icon: const Icon(Icons.close_rounded, size: 18),
                         color: C.textMuted,
                         onPressed: _toggle),
                   ]),
@@ -242,7 +247,7 @@ class _AvaChatbotState extends State<AvaChatbot>
                   decoration: BoxDecoration(
                     color: C.surface,
                     borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(20)),
+                        bottom: Radius.circular(16)),
                     border: Border(top: BorderSide(color: C.border)),
                   ),
                   child: Row(children: [
@@ -253,7 +258,7 @@ class _AvaChatbotState extends State<AvaChatbot>
                         onSubmitted: (_) => _send(),
                         decoration: InputDecoration(
                           hintText: 'Ask me anything…',
-                          hintStyle: body(color: C.textDim),
+                          hintStyle: body(c: C.textDim),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(50),
                             borderSide: BorderSide.none,
@@ -271,13 +276,12 @@ class _AvaChatbotState extends State<AvaChatbot>
                       onTap: _send,
                       child: Container(
                         padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                              colors: [C.accent, C.accentDim]),
+                        decoration: const BoxDecoration(
+                          color: C.accent,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.arrow_upward_rounded,
-                            color: Colors.black, size: 18),
+                            color: Colors.white, size: 16),
                       ),
                     ),
                   ]),
@@ -303,30 +307,26 @@ class _AvaChatbotState extends State<AvaChatbot>
         child: GestureDetector(
           onTap: _toggle,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 56,
-            height: 56,
+            duration: const Duration(milliseconds: 250),
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [C.accent, C.purple],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: C.accent,
               boxShadow: [
                 BoxShadow(
-                    color: C.accent.withOpacity(0.4),
-                    blurRadius: 20,
+                    color: C.accent.withOpacity(0.35),
+                    blurRadius: 18,
                     spreadRadius: -4)
               ],
             ),
             child: AnimatedRotation(
               turns: _isOpen ? 0.5 : 0,
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 250),
               child: Icon(
                   _isOpen ? Icons.close_rounded : Icons.auto_awesome_rounded,
-                  color: Colors.black,
-                  size: 24),
+                  color: Colors.white,
+                  size: 22),
             ),
           ),
         ),
@@ -343,15 +343,14 @@ class _AvaAvatar extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
-            colors: [C.accent, C.purple],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight),
+        color: C.accent,
       ),
       child: Center(
-          child: Text('Ava', style: mono(color: Colors.black, size: 10))),
+          child: Text('Ava',
+              style: label(c: Colors.white, sz: 9.5)
+                  .copyWith(fontWeight: FontWeight.w700))),
     );
   }
 }
@@ -368,22 +367,23 @@ class _Bubble extends StatelessWidget {
             msg.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (!msg.isUser) ...[_AvaAvatar(size: 26), const SizedBox(width: 8)],
+          if (!msg.isUser) ...[_AvaAvatar(size: 24), const SizedBox(width: 8)],
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: msg.isUser ? C.accent : C.surface,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(msg.isUser ? 16 : 4),
-                  bottomRight: Radius.circular(msg.isUser ? 4 : 16),
+                  topLeft: const Radius.circular(14),
+                  topRight: const Radius.circular(14),
+                  bottomLeft: Radius.circular(msg.isUser ? 14 : 3),
+                  bottomRight: Radius.circular(msg.isUser ? 3 : 14),
                 ),
                 border: msg.isUser ? null : Border.all(color: C.border),
               ),
               child: Text(msg.message,
-                  style: body(color: msg.isUser ? Colors.black : C.text)),
+                  style: body(c: msg.isUser ? Colors.white : C.text)
+                      .copyWith(fontSize: 13.5)),
             ),
           ),
         ],
@@ -417,17 +417,17 @@ class _TypingIndicatorState extends State<_TypingIndicator>
   @override
   Widget build(BuildContext context) {
     return Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-      _AvaAvatar(size: 26),
+      _AvaAvatar(size: 24),
       const SizedBox(width: 8),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: C.surface,
           borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
-              bottomRight: Radius.circular(16),
-              bottomLeft: Radius.circular(4)),
+              topLeft: Radius.circular(14),
+              topRight: Radius.circular(14),
+              bottomRight: Radius.circular(14),
+              bottomLeft: Radius.circular(3)),
           border: Border.all(color: C.border),
         ),
         child: AnimatedBuilder(
@@ -438,10 +438,10 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                 opacity:
                     (math.sin((_ctrl.value * 2 * math.pi) - (i * 0.8)) + 1) / 2,
                 child: Container(
-                    width: 6,
-                    height: 6,
-                    decoration:
-                        BoxDecoration(color: C.accent, shape: BoxShape.circle)),
+                    width: 5,
+                    height: 5,
+                    decoration: const BoxDecoration(
+                        color: C.accent, shape: BoxShape.circle)),
               ),
               if (i < 2) const SizedBox(width: 4),
             ]
@@ -461,30 +461,31 @@ class _WelcomePopup extends StatelessWidget {
       color: Colors.transparent,
       child: Container(
         padding: const EdgeInsets.all(14),
-        constraints: const BoxConstraints(maxWidth: 240),
+        constraints: const BoxConstraints(maxWidth: 230),
         decoration: BoxDecoration(
           color: C.card,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: C.accent.withOpacity(0.4)),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: C.borderHi),
           boxShadow: [
-            BoxShadow(color: C.accent.withOpacity(0.1), blurRadius: 20)
+            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20)
           ],
         ),
         child: Row(children: [
-          _AvaAvatar(size: 32),
+          _AvaAvatar(size: 30),
           const SizedBox(width: 10),
           Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Hey! I\'m Ava 👋', style: mono(size: 12)),
+              Text("Hey! I'm Ava 👋", style: label(sz: 11.5)),
               const SizedBox(height: 2),
-              Text('Ask me about Aman', style: body(color: C.textMuted)),
+              Text('Ask me about Aman',
+                  style: body(c: C.textMuted).copyWith(fontSize: 12)),
             ]),
           ),
           GestureDetector(
             onTap: onDismiss,
             child:
-                const Icon(Icons.close_rounded, size: 16, color: C.textMuted),
+                const Icon(Icons.close_rounded, size: 14, color: C.textMuted),
           ),
         ]),
       ),
@@ -512,13 +513,13 @@ class Project {
 
 const _projects = [
   Project(
-    title: 'Lynn Concierge',
+    title: 'Concierge AI',
     description:
-        'WhatsApp AI concierge managing everyday tasks — flights, hotels, Amazon, reminders — via intelligent LangGraph automation with seamless human handoff.',
+        'Conversational AI concierge managing everyday tasks — flights, hotels, Amazon, reminders — via intelligent LangGraph automation with seamless human handoff.',
     tag: 'Production',
-    tagColor: C.success,
-    chips: ['LangGraph', 'LLM', 'WhatsApp API', 'Python'],
-    web: 'https://concierge.pinch.co.in/lynn',
+    tagColor: C.green,
+    chips: ['Python', 'LangGraph', 'LLM', 'RAG', 'Redis'],
+    web: 'https://apps.apple.com/in/app/patronos/id6749004848',
   ),
   Project(
     title: 'GrabPic',
@@ -526,13 +527,13 @@ const _projects = [
         'AI-powered event photo retrieval using facial recognition and vector search. Attendees selfie to instantly find themselves across thousands of event photos.',
     tag: 'GenAI',
     tagColor: C.accent,
-    chips: ['FastAPI', 'Redis Queue', 'Vector Search', 'JWT'],
+    chips: ['FastAPI', 'RabbitMQ', 'Vector Search', 'JWT'],
     github: 'https://github.com/obaidaaman/GrabPic',
   ),
   Project(
     title: 'Agentic Blogger',
     description:
-        'An Agentic AI blogging pipeline built using LangGraph, FastAPI, and structured LLM outputs. The system generates complete blog posts from a topic by orchestrating multiple AI agents including routing, research, planning, parallel section generation, and image generation.',
+        'LangGraph-powered blogging pipeline orchestrating multiple AI agents — routing, research, planning, parallel section generation, and image generation — into a single automated workflow.',
     tag: 'GenAI',
     tagColor: C.accent,
     chips: ['FastAPI', 'LangGraph', 'Vector Search', 'API'],
@@ -543,7 +544,7 @@ const _projects = [
     description:
         'RAG-powered intelligent personal assistant using LangChain that represents my professional profile to potential collaborators and employers.',
     tag: 'GenAI',
-    tagColor: C.purple,
+    tagColor: C.accent,
     chips: ['LangChain', 'RAG', 'LangSmith', 'FastAPI'],
     github: 'https://github.com/obaidaaman/PersonalAIBot',
   ),
@@ -552,7 +553,7 @@ const _projects = [
     description:
         'Role-based maintenance workflow for tenants, managers, and technicians with JWT auth, Firestore logging, and real-time email notifications.',
     tag: 'Backend',
-    tagColor: C.accentDim,
+    tagColor: C.textMuted,
     chips: ['FastAPI', 'Firebase', 'JWT', 'Event-driven'],
   ),
   Project(
@@ -560,7 +561,7 @@ const _projects = [
     description:
         'Full-stack multi-user quiz platform with Flask, Jinja2 & SQLite. Subject/chapter-wise quiz creation with comprehensive admin interface.',
     tag: 'Full Stack',
-    tagColor: C.success,
+    tagColor: C.green,
     chips: ['Flask', 'SQLite', 'Jinja2', 'Python'],
     github: 'https://github.com/obaidaaman/Quiz-Master',
   ),
@@ -637,7 +638,7 @@ class _PortfolioPageState extends State<_PortfolioPage> {
     final ctx = _keys[i].currentContext;
     if (ctx == null) return;
     Scrollable.ensureVisible(ctx,
-        duration: const Duration(milliseconds: 600),
+        duration: const Duration(milliseconds: 650),
         curve: Curves.easeInOutCubic);
   }
 
@@ -645,19 +646,16 @@ class _PortfolioPageState extends State<_PortfolioPage> {
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
     final mobile = w < 700;
-
     return Scaffold(
       backgroundColor: C.bg,
       body: Stack(children: [
-        // Background grid
-        const _GridBackground(),
-        // Content
+        const _SubtleBackground(),
         SingleChildScrollView(
           controller: _scroll,
           child: Column(children: [
             _NavBar(scrolled: _scrolled, mobile: mobile, onTap: _scrollTo),
             _HeroSection(
-                key: _keys[0], mobile: mobile, onContact: () => _scrollTo(3)),
+                key: _keys[0], mobile: mobile, onContact: () => _scrollTo(4)),
             _SkillsSection(key: _keys[1], mobile: mobile),
             _ExperienceSection(key: _keys[2], mobile: mobile),
             _ProjectsSection(key: _keys[3], mobile: mobile),
@@ -665,7 +663,6 @@ class _PortfolioPageState extends State<_PortfolioPage> {
             const _Footer(),
           ]),
         ),
-        // Ava
         const AvaChatbot(),
       ]),
     );
@@ -674,36 +671,33 @@ class _PortfolioPageState extends State<_PortfolioPage> {
 
 // ─── BACKGROUND ──────────────────────────────────────────────────────────────
 
-class _GridBackground extends StatelessWidget {
-  const _GridBackground();
+class _SubtleBackground extends StatelessWidget {
+  const _SubtleBackground();
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: CustomPaint(painter: _GridPainter()),
-    );
+    return Positioned.fill(child: CustomPaint(painter: _BgPainter()));
   }
 }
 
-class _GridPainter extends CustomPainter {
+class _BgPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = C.border.withOpacity(0.35)
-      ..strokeWidth = 0.5;
-    const spacing = 60.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    // Very subtle dot grid
+    final dot = Paint()..color = C.border.withOpacity(0.55);
+    const step = 44.0;
+    for (double x = 0; x < size.width; x += step) {
+      for (double y = 0; y < size.height; y += step) {
+        canvas.drawCircle(Offset(x, y), 0.9, dot);
+      }
     }
-    for (double y = 0; y < size.height; y += spacing) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-    // Glow at top
+    // Top-center glow
     final glow = Paint()
       ..shader = RadialGradient(
-        colors: [C.accent.withOpacity(0.06), Colors.transparent],
-        radius: 0.6,
-      ).createShader(Rect.fromLTWH(size.width * 0.5 - 300, -200, 600, 600));
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, 600), glow);
+        colors: [const Color(0xff4F7EF8).withOpacity(0.07), Colors.transparent],
+        radius: 0.7,
+      ).createShader(Rect.fromCenter(
+          center: Offset(size.width / 2, -80), width: 900, height: 700));
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, 500), glow);
   }
 
   @override
@@ -724,17 +718,15 @@ class _NavBar extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
       decoration: BoxDecoration(
-        color: scrolled ? C.surface.withOpacity(0.9) : Colors.transparent,
+        color: scrolled ? C.surface.withOpacity(0.92) : Colors.transparent,
         border: scrolled ? Border(bottom: BorderSide(color: C.border)) : null,
       ),
       child: Row(children: [
-        // Logo
         Text.rich(TextSpan(children: [
           TextSpan(
               text: 'AO',
-              style: mono(color: C.accent, size: 18)
-                  .copyWith(fontWeight: FontWeight.w900)),
-          TextSpan(text: '.dev', style: mono(color: C.textMuted, size: 14)),
+              style: label(sz: 17).copyWith(fontWeight: FontWeight.w900)),
+          TextSpan(text: '.dev', style: label(c: C.textMuted, sz: 13)),
         ])),
         const Spacer(),
         if (!mobile)
@@ -769,7 +761,7 @@ class _NavItemState extends State<_NavItem> {
         onTap: widget.onTap,
         child: AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 150),
-          style: mono(color: _hover ? C.accent : C.textMuted, size: 13),
+          style: label(c: _hover ? C.accent : C.textMuted, sz: 13),
           child: Text(widget.label),
         ),
       ),
@@ -798,14 +790,14 @@ class _HeroSectionState extends State<_HeroSection>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1200))
+        vsync: this, duration: const Duration(milliseconds: 1100))
       ..forward();
     _fade = CurvedAnimation(
-        parent: _ctrl, curve: const Interval(0, 0.6, curve: Curves.easeOut));
-    _slide = Tween(begin: const Offset(0, 0.06), end: Offset.zero).animate(
+        parent: _ctrl, curve: const Interval(0, 0.65, curve: Curves.easeOut));
+    _slide = Tween(begin: const Offset(0, 0.05), end: Offset.zero).animate(
         CurvedAnimation(
             parent: _ctrl,
-            curve: const Interval(0, 0.7, curve: Curves.easeOut)));
+            curve: const Interval(0, 0.75, curve: Curves.easeOut)));
   }
 
   @override
@@ -821,7 +813,7 @@ class _HeroSectionState extends State<_HeroSection>
       child: SlideTransition(
         position: _slide,
         child: Container(
-          constraints: const BoxConstraints(minHeight: 680),
+          constraints: const BoxConstraints(minHeight: 660),
           padding: EdgeInsets.fromLTRB(
               widget.mobile ? 24 : 80, 80, widget.mobile ? 24 : 80, 60),
           child: widget.mobile
@@ -838,14 +830,11 @@ class _HeroDesktop extends StatelessWidget {
   const _HeroDesktop({required this.onContact});
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(flex: 6, child: _HeroContent(onContact: onContact)),
-        const SizedBox(width: 60),
-        Expanded(flex: 4, child: _HeroCard()),
-      ],
-    );
+    return Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      Expanded(flex: 6, child: _HeroContent(onContact: onContact)),
+      const SizedBox(width: 60),
+      Expanded(flex: 4, child: _HeroCard()),
+    ]);
   }
 }
 
@@ -868,48 +857,48 @@ class _HeroContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Badge
+      // Status badge
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: C.accentGlow,
+          color: C.green.withOpacity(0.08),
           borderRadius: BorderRadius.circular(50),
-          border: Border.all(color: C.accent.withOpacity(0.3)),
+          border: Border.all(color: C.green.withOpacity(0.25)),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Container(
               width: 6,
               height: 6,
               decoration:
-                  BoxDecoration(color: C.accent, shape: BoxShape.circle)),
+                  const BoxDecoration(color: C.green, shape: BoxShape.circle)),
           const SizedBox(width: 8),
-          Text('Available for opportunities', style: mono(size: 11)),
+          Text('Available for opportunities', style: label(c: C.green, sz: 11)),
         ]),
       ),
-      const SizedBox(height: 24),
-      Text('Aman', style: heading1().copyWith(fontSize: 56, color: C.text)),
-      Text('Obaid', style: heading1().copyWith(fontSize: 56, color: C.accent)),
-      const SizedBox(height: 16),
+      const SizedBox(height: 28),
+      Text('Aman', style: h1()),
+      Text('Obaid', style: h1(c: C.accent)),
+      const SizedBox(height: 18),
       Row(children: [
-        Text('AI Backend Engineer  •  ', style: body(color: C.textMuted)),
+        Text('AI Backend Engineer  •  ', style: body(c: C.text)),
         const _TypingRole(),
       ]),
-      const SizedBox(height: 20),
+      const SizedBox(height: 22),
       SizedBox(
         width: 480,
         child: Text(
           'Building intelligent systems that bridge the gap between advanced AI models and real-world applications. Specialising in LLM orchestration, RAG pipelines, and autonomous agent architectures.',
-          style: body(color: C.textMuted),
+          style: body(c: C.text),
         ),
       ),
-      const SizedBox(height: 36),
-      Wrap(spacing: 14, runSpacing: 14, children: [
+      const SizedBox(height: 38),
+      Wrap(spacing: 12, runSpacing: 12, children: [
         _PrimaryBtn('Get In Touch', Icons.arrow_forward_rounded, onContact),
         _OutlineBtn(
             'Resume',
             Icons.download_rounded,
             () => js.context
-                .callMethod('open', ['assets/Resume_Aman_Obaid.pdf'])),
+                .callMethod('open', ['assets/resume_amanobaidR.pdf'])),
         _OutlineBtn(
             'GitHub',
             Icons.code_rounded,
@@ -932,71 +921,60 @@ class _HeroCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: C.card,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: C.border),
         boxShadow: [
           BoxShadow(
-              color: C.accent.withOpacity(0.07),
-              blurRadius: 60,
-              spreadRadius: -10)
+              color: Colors.black.withOpacity(0.35),
+              blurRadius: 50,
+              spreadRadius: -10),
         ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Profile area
         Row(children: [
           Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                  colors: [C.accent, C.purple],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight),
-            ),
+            width: 52,
+            height: 52,
+            decoration:
+                const BoxDecoration(shape: BoxShape.circle, color: C.accent),
             child: const Center(
                 child: Text('AO',
                     style: TextStyle(
                         fontFamily: 'monospace',
                         fontWeight: FontWeight.w900,
-                        fontSize: 18,
-                        color: Colors.black))),
+                        fontSize: 16,
+                        color: Colors.white))),
           ),
           const SizedBox(width: 14),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Aman Obaid', style: heading3()),
-            Text('AI Backend Engineer',
-                style: mono(color: C.textMuted, size: 12)),
+            Text('Aman Obaid', style: h3()),
+            Text('AI Backend Engineer', style: label(c: C.textMuted, sz: 12)),
           ])
         ]),
-        const SizedBox(height: 24),
-        // Divider
+        const SizedBox(height: 22),
         Container(height: 1, color: C.border),
-        const SizedBox(height: 20),
-        // Stats
+        const SizedBox(height: 18),
         _StatRow('Experience', '1.5+ years', C.accent),
-        const SizedBox(height: 12),
-        _StatRow('Projects', '6+ shipped', C.purple),
-        const SizedBox(height: 12),
-        _StatRow('Education', 'IIT Madras', C.success),
-        const SizedBox(height: 12),
-        _StatRow('Speciality', 'LLM Systems', C.warning),
-        const SizedBox(height: 20),
+        const SizedBox(height: 11),
+        _StatRow('Projects', '6+ shipped', C.green),
+        const SizedBox(height: 11),
+        _StatRow('Education', 'IIT Madras', C.amber),
+        const SizedBox(height: 11),
+        _StatRow('Speciality', 'LLM Systems', C.accent),
+        const SizedBox(height: 18),
         Container(height: 1, color: C.border),
-        const SizedBox(height: 16),
-
-        Text('Core Stack', style: mono(color: C.textDim, size: 11)),
+        const SizedBox(height: 14),
+        Text('Core Stack', style: label(c: C.textDim, sz: 10.5)),
         const SizedBox(height: 10),
         Wrap(spacing: 6, runSpacing: 6, children: [
           for (final t in ['LangGraph', 'RAG', 'FastAPI', 'Python', 'Flutter'])
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: C.bg,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: C.border),
-              ),
-              child: Text(t, style: mono(color: C.textMuted, size: 10)),
+                  color: C.bg,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: C.border)),
+              child: Text(t, style: label(c: C.textMuted, sz: 10)),
             ),
         ]),
       ]),
@@ -1005,21 +983,21 @@ class _HeroCard extends StatelessWidget {
 }
 
 class _StatRow extends StatelessWidget {
-  final String label, value;
+  final String lbl, val;
   final Color color;
-  const _StatRow(this.label, this.value, this.color);
+  const _StatRow(this.lbl, this.val, this.color);
   @override
   Widget build(BuildContext context) {
     return Row(children: [
       Container(
           width: 3,
-          height: 14,
+          height: 12,
           decoration: BoxDecoration(
               color: color, borderRadius: BorderRadius.circular(2))),
       const SizedBox(width: 10),
-      Text('$label:', style: mono(color: C.textMuted, size: 12)),
+      Text('$lbl:', style: label(c: C.textMuted, sz: 11.5)),
       const Spacer(),
-      Text(value, style: mono(color: color, size: 12)),
+      Text(val, style: label(c: color, sz: 11.5)),
     ]);
   }
 }
@@ -1051,11 +1029,9 @@ class _TypingRoleState extends State<_TypingRole> {
     if (!mounted) return;
     final full = _roles[_idx];
     setState(() {
-      if (_del) {
-        _curr = full.substring(0, _curr.length - 1);
-      } else {
-        _curr = full.substring(0, _curr.length + 1);
-      }
+      _curr = _del
+          ? full.substring(0, _curr.length - 1)
+          : full.substring(0, _curr.length + 1);
     });
     if (!_del && _curr == full) {
       await Future.delayed(const Duration(seconds: 2));
@@ -1064,62 +1040,57 @@ class _TypingRoleState extends State<_TypingRole> {
       _del = false;
       _idx = (_idx + 1) % _roles.length;
     }
-    await Future.delayed(Duration(milliseconds: _del ? 40 : 80));
+    await Future.delayed(Duration(milliseconds: _del ? 38 : 78));
     _tick();
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      Text(_curr, style: mono(color: C.accent, size: 15)),
-      Text('|', style: mono(color: C.accent, size: 15)),
+      Text(_curr, style: label(c: C.accent, sz: 14.5)),
+      Text('|', style: label(c: C.accent, sz: 14.5)),
     ]);
   }
 }
 
 class _PrimaryBtn extends StatefulWidget {
-  final String label;
+  final String lbl;
   final IconData icon;
   final VoidCallback onTap;
-  const _PrimaryBtn(this.label, this.icon, this.onTap);
+  const _PrimaryBtn(this.lbl, this.icon, this.onTap);
   @override
   State<_PrimaryBtn> createState() => _PrimaryBtnState();
 }
 
 class _PrimaryBtnState extends State<_PrimaryBtn> {
-  bool _hover = false;
+  bool _h = false;
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
+      onEnter: (_) => setState(() => _h = true),
+      onExit: (_) => setState(() => _h = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: _hover
-                  ? [C.accent.withOpacity(0.9), C.purple.withOpacity(0.9)]
-                  : [C.accent, C.accentDim],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(10),
+            color: _h ? C.accent.withOpacity(0.88) : C.accent,
+            borderRadius: BorderRadius.circular(9),
             boxShadow: [
               BoxShadow(
-                  color: C.accent.withOpacity(_hover ? 0.4 : 0.2),
-                  blurRadius: 20)
+                  color: C.accent.withOpacity(_h ? 0.38 : 0.18),
+                  blurRadius: 18,
+                  spreadRadius: -4)
             ],
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(widget.label,
-                style: mono(color: Colors.black, size: 14)
+            Text(widget.lbl,
+                style: label(c: Colors.white, sz: 13.5)
                     .copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(width: 8),
-            Icon(widget.icon, color: Colors.black, size: 16),
+            Icon(widget.icon, color: Colors.white, size: 15),
           ]),
         ),
       ),
@@ -1128,38 +1099,37 @@ class _PrimaryBtnState extends State<_PrimaryBtn> {
 }
 
 class _OutlineBtn extends StatefulWidget {
-  final String label;
+  final String lbl;
   final IconData icon;
   final VoidCallback onTap;
-  const _OutlineBtn(this.label, this.icon, this.onTap);
+  const _OutlineBtn(this.lbl, this.icon, this.onTap);
   @override
   State<_OutlineBtn> createState() => _OutlineBtnState();
 }
 
 class _OutlineBtnState extends State<_OutlineBtn> {
-  bool _hover = false;
+  bool _h = false;
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
+      onEnter: (_) => setState(() => _h = true),
+      onExit: (_) => setState(() => _h = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
           decoration: BoxDecoration(
-            color: _hover ? C.card : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: _hover ? C.accent.withOpacity(0.5) : C.border),
+            color: _h ? C.card : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(color: _h ? C.borderHi : C.border),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(widget.icon, color: _hover ? C.accent : C.textMuted, size: 16),
+            Icon(widget.icon, color: _h ? C.accent : C.textMuted, size: 15),
             const SizedBox(width: 8),
-            Text(widget.label,
-                style: mono(color: _hover ? C.accent : C.textMuted, size: 13)),
+            Text(widget.lbl,
+                style: label(c: _h ? C.accent : C.textMuted, sz: 13)),
           ]),
         ),
       ),
@@ -1176,30 +1146,30 @@ class _SkillsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cats = _skills.map((s) => s['cat']!).toSet().toList();
-    final catColors = {
+    final catColors = <String, Color>{
       'LLM Frameworks': C.accent,
-      'Backend': C.purple,
-      'Vector DBs': C.success,
-      'Languages': C.warning,
-      'Cloud': C.accentDim,
-      'Observability': Color(0xffFF6B9D),
+      'Backend': C.accent,
+      'Vector DBs': C.green,
+      'Languages': C.amber,
+      'Cloud': C.green,
+      'Observability': C.textMuted,
       'Tools': C.textMuted,
     };
     return Container(
       padding: EdgeInsets.symmetric(horizontal: mobile ? 24 : 80, vertical: 80),
       child: Column(children: [
         _SectionLabel('Skills & Technologies'),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Text('The tools I use to build intelligent systems',
-            style: body(color: C.textMuted)),
+            style: body(c: C.textMuted)),
         const SizedBox(height: 48),
         Wrap(
-          spacing: 20,
-          runSpacing: 20,
+          spacing: 18,
+          runSpacing: 18,
           alignment: WrapAlignment.center,
           children: cats.map((cat) {
-            final catSkills = _skills.where((s) => s['cat'] == cat).toList();
-            return _SkillGroup(cat, catSkills, catColors[cat] ?? C.accent);
+            final items = _skills.where((s) => s['cat'] == cat).toList();
+            return _SkillGroup(cat, items, catColors[cat] ?? C.accent);
           }).toList(),
         ),
       ]),
@@ -1216,28 +1186,28 @@ class _SkillGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 240,
-      padding: const EdgeInsets.all(20),
+      width: 230,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: C.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.18)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Container(
-              width: 8,
-              height: 8,
+              width: 7,
+              height: 7,
               decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const SizedBox(width: 8),
-          Text(category, style: mono(color: color, size: 11)),
+          Text(category, style: label(c: color, sz: 10.5)),
         ]),
         const SizedBox(height: 14),
         ...items.map((s) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(children: [
                 Icon(Icons.chevron_right_rounded,
-                    size: 14, color: color.withOpacity(0.6)),
+                    size: 13, color: color.withOpacity(0.5)),
                 const SizedBox(width: 4),
                 Text(s['label']!, style: body().copyWith(fontSize: 13)),
               ]),
@@ -1257,21 +1227,16 @@ class _ExperienceSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: mobile ? 24 : 80, vertical: 80),
-      color: C.surface.withOpacity(0.5),
+      color: C.surface.withOpacity(0.4),
       child: Column(children: [
         _SectionLabel('Experience'),
-        const SizedBox(height: 12),
-        Text('Where I\'ve built real-world AI systems',
-            style: body(color: C.textMuted)),
+        const SizedBox(height: 10),
+        Text("Where I've built real-world AI systems",
+            style: body(c: C.textMuted)),
         const SizedBox(height: 48),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 860),
           child: _ExperienceCard(mobile: mobile),
-        ),
-        const SizedBox(height: 28),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 860),
-          child: _EducationCard(mobile: mobile),
         ),
       ]),
     );
@@ -1284,19 +1249,19 @@ class _ExperienceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final achievements = [
-      'Architected AI-integrated WhatsApp concierge system using LangGraph handling 100+ concurrent conversations.',
-      'Designed stateful multi-agent LLM system with persistent conversational memory and seamless human operator handoff with full context continuity.',
-      'Built human-in-the-loop workflows autonomously executing web search, flight/hotel bookings, Amazon actions, reminders, and CRED integrations.',
-      'Designed RAG-powered memory architecture supporting long-term recall across months of user interactions for context-sensitive personalisation.',
-      'Developed event-driven async backend with multi-source ingestion and real-time decision routing across APIs and fulfillment services.',
+    final items = [
+      'Architected a stateful multi-agent system using LangGraph, implementing persistent graph memory and thread-level checkpoints to manage state-machine transitions for 100+ concurrent sessions.',
+      'Engineered a Human-in-the-Loop (HITL) orchestration layer that facilitates seamless model-to-operator context transfer, ensuring full graph state continuity during complex transition events.',
+      'Developed a decoupled autonomous execution engine for multi-service tool-calling (Amazon, CRED, Web-Search); managed the lifecycle of agentic actions through distributed background workers to ensure system reliability.',
+      'Implemented a high-dimensional RAG memory architecture optimized for long-horizon context recall, leveraging vector-search indexing to maintain retrieval accuracy across months of user interaction data.',
+      'Built an event-driven asynchronous backend using FastAPI and message brokering for multi-source ingestion, utilizing real-time decision routing to coordinate tasks across distributed fulfillment APIs.'
     ];
 
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: C.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: C.border),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1306,98 +1271,51 @@ class _ExperienceCard extends StatelessWidget {
             decoration: BoxDecoration(
                 color: C.accentGlow,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: C.accent.withOpacity(0.3))),
+                border: Border.all(color: C.accent.withOpacity(0.25))),
             child: const Icon(Icons.auto_awesome_rounded,
-                color: C.accent, size: 20),
+                color: C.accent, size: 18),
           ),
           const SizedBox(width: 14),
           Expanded(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Text('AI Backend Engineer', style: heading3()),
-                const SizedBox(height: 2),
-                Text('Pinch Lifestyle Pvt Ltd',
-                    style: mono(color: C.accent, size: 13)),
+                Text('AI Backend Engineer', style: h3()),
+                const SizedBox(height: 3),
+                Text('Pinch Lifestyle Pvt Ltd', style: label(sz: 12.5)),
               ])),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: C.success.withOpacity(0.1),
+              color: C.green.withOpacity(0.08),
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: C.success.withOpacity(0.3)),
+              border: Border.all(color: C.green.withOpacity(0.25)),
             ),
-            child: Text('Aug 2024 – Jan 2026',
-                style: mono(color: C.success, size: 11)),
+            child:
+                Text('Aug 2024 – Jan 2026', style: label(c: C.green, sz: 11)),
           ),
         ]),
-        const SizedBox(height: 24),
+        const SizedBox(height: 22),
         Container(height: 1, color: C.border),
-        const SizedBox(height: 20),
-        ...achievements.map((a) => Padding(
+        const SizedBox(height: 18),
+        ...items.map((a) => Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 6),
+                  padding: const EdgeInsets.only(top: 7),
                   child: Container(
-                      width: 5,
-                      height: 5,
-                      decoration: BoxDecoration(
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
                           color: C.accent, shape: BoxShape.circle)),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                     child: Text(a,
-                        style:
-                            body(color: C.textMuted).copyWith(fontSize: 14))),
+                        style: body(c: C.text).copyWith(fontSize: 13.5))),
               ]),
             )),
-      ]),
-    );
-  }
-}
-
-class _EducationCard extends StatelessWidget {
-  final bool mobile;
-  const _EducationCard({required this.mobile});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: C.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: C.border),
-      ),
-      child: Row(children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              color: C.purpleGlow,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: C.purple.withOpacity(0.3))),
-          child: const Icon(Icons.school_rounded, color: C.purple, size: 20),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('B.S in Data Science and Application',
-              style: heading3().copyWith(fontSize: 16)),
-          const SizedBox(height: 4),
-          Text('Indian Institute of Technology, Madras',
-              style: mono(color: C.purple, size: 12)),
-        ])),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: C.purple.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: C.purple.withOpacity(0.3)),
-          ),
-          child: Text('2023 – 2027', style: mono(color: C.purple, size: 11)),
-        ),
       ]),
     );
   }
@@ -1415,63 +1333,53 @@ class _ProjectsSection extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: mobile ? 24 : 80, vertical: 80),
       child: Column(children: [
         _SectionLabel('Projects'),
-        const SizedBox(height: 12),
-        Text('Things I\'ve built, shipped and maintained',
-            style: body(color: C.textMuted)),
+        const SizedBox(height: 10),
+        Text("Things I've built, shipped and maintained",
+            style: body(c: C.textMuted)),
         const SizedBox(height: 48),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1100),
-          child: _ProjectsGrid(mobile: mobile),
+          child: Wrap(
+            spacing: 18,
+            runSpacing: 18,
+            alignment: WrapAlignment.center,
+            children: _projects
+                .map((p) => _ProjectCard(p: p, mobile: mobile))
+                .toList(),
+          ),
         ),
       ]),
     );
   }
 }
 
-class _ProjectsGrid extends StatelessWidget {
-  final bool mobile;
-  const _ProjectsGrid({required this.mobile});
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 20,
-      runSpacing: 20,
-      alignment: WrapAlignment.center,
-      children: _projects
-          .map((p) => _ProjectCard(project: p, mobile: mobile))
-          .toList(),
-    );
-  }
-}
-
 class _ProjectCard extends StatefulWidget {
-  final Project project;
+  final Project p;
   final bool mobile;
-  const _ProjectCard({required this.project, required this.mobile});
+  const _ProjectCard({required this.p, required this.mobile});
   @override
   State<_ProjectCard> createState() => _ProjectCardState();
 }
 
 class _ProjectCardState extends State<_ProjectCard> {
-  bool _hover = false;
-
+  bool _h = false;
   @override
   Widget build(BuildContext context) {
-    final p = widget.project;
+    final p = widget.p;
     return MouseRegion(
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
+      onEnter: (_) => setState(() => _h = true),
+      onExit: (_) => setState(() => _h = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        width: widget.mobile ? double.infinity : 330,
-        padding: const EdgeInsets.all(24),
+        duration: const Duration(milliseconds: 220),
+        width: widget.mobile ? double.infinity : 325,
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
-          color: _hover ? C.cardHover : C.card,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-              color: _hover ? p.tagColor.withOpacity(0.4) : C.border),
-          boxShadow: _hover
-              ? [BoxShadow(color: p.tagColor.withOpacity(0.12), blurRadius: 30)]
+          color: _h ? C.cardHover : C.card,
+          borderRadius: BorderRadius.circular(16),
+          border:
+              Border.all(color: _h ? p.tagColor.withOpacity(0.35) : C.border),
+          boxShadow: _h
+              ? [BoxShadow(color: p.tagColor.withOpacity(0.08), blurRadius: 28)]
               : [],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1479,11 +1387,11 @@ class _ProjectCardState extends State<_ProjectCard> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: p.tagColor.withOpacity(0.12),
+                color: p.tagColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: p.tagColor.withOpacity(0.3)),
+                border: Border.all(color: p.tagColor.withOpacity(0.25)),
               ),
-              child: Text(p.tag, style: mono(color: p.tagColor, size: 10)),
+              child: Text(p.tag, style: label(c: p.tagColor, sz: 10)),
             ),
             const Spacer(),
             if (p.github != null)
@@ -1491,14 +1399,14 @@ class _ProjectCardState extends State<_ProjectCard> {
             if (p.web != null)
               _IconLink(Icons.open_in_new_rounded, 'Web', p.web!),
           ]),
-          const SizedBox(height: 16),
-          Text(p.title, style: heading3().copyWith(fontSize: 18)),
-          const SizedBox(height: 10),
+          const SizedBox(height: 14),
+          Text(p.title, style: h3().copyWith(fontSize: 16.5)),
+          const SizedBox(height: 9),
           Text(p.description,
-              style: body(color: C.textMuted).copyWith(fontSize: 13),
+              style: body(c: C.textMuted).copyWith(fontSize: 13),
               maxLines: 4,
               overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           Wrap(
               spacing: 6,
               runSpacing: 6,
@@ -1507,12 +1415,10 @@ class _ProjectCardState extends State<_ProjectCard> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: C.bg,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: C.border),
-                        ),
-                        child:
-                            Text(chip, style: mono(color: C.textDim, size: 10)),
+                            color: C.bg,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: C.border)),
+                        child: Text(chip, style: label(c: C.text, sz: 10)),
                       ))
                   .toList()),
         ]),
@@ -1523,8 +1429,7 @@ class _ProjectCardState extends State<_ProjectCard> {
 
 class _IconLink extends StatefulWidget {
   final IconData icon;
-  final String tooltip;
-  final String url;
+  final String tooltip, url;
   const _IconLink(this.icon, this.tooltip, this.url);
   @override
   State<_IconLink> createState() => _IconLinkState();
@@ -1545,7 +1450,7 @@ class _IconLinkState extends State<_IconLink> {
           child: Padding(
             padding: const EdgeInsets.only(left: 8),
             child:
-                Icon(widget.icon, size: 18, color: _h ? C.accent : C.textDim),
+                Icon(widget.icon, size: 17, color: _h ? C.accent : C.textDim),
           ),
         ),
       ),
@@ -1563,12 +1468,12 @@ class _ContactSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: mobile ? 24 : 80, vertical: 80),
-      color: C.surface.withOpacity(0.5),
+      color: C.surface.withOpacity(0.4),
       child: Column(children: [
         _SectionLabel('Contact'),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Text("Let's build something great together",
-            style: body(color: C.textMuted)),
+            style: body(c: C.textMuted)),
         const SizedBox(height: 48),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 700),
@@ -1590,19 +1495,19 @@ class _ContactCards extends StatelessWidget {
         'icon': Icons.email_rounded,
         'label': 'Email',
         'value': 'amanobaidofficial01@gmail.com',
-        'color': C.accent
+        'color': C.accent,
       },
       {
         'icon': Icons.person_rounded,
         'label': 'LinkedIn',
         'value': 'https://www.linkedin.com/in/obaidaman14',
-        'color': C.purple
+        'color': C.accent,
       },
       {
         'icon': Icons.code_rounded,
         'label': 'GitHub',
         'value': 'https://www.github.com/obaidaaman',
-        'color': C.success
+        'color': C.green,
       },
     ];
 
@@ -1613,8 +1518,8 @@ class _ContactCards extends StatelessWidget {
       children: contacts
           .map((c) => _ContactCard(
                 icon: c['icon'] as IconData,
-                label: c['label'] as String,
-                value: c['value'] as String,
+                lbl: c['label'] as String,
+                val: c['value'] as String,
                 color: c['color'] as Color,
                 mobile: mobile,
               ))
@@ -1625,15 +1530,16 @@ class _ContactCards extends StatelessWidget {
 
 class _ContactCard extends StatefulWidget {
   final IconData icon;
-  final String label, value;
+  final String lbl, val;
   final Color color;
   final bool mobile;
-  const _ContactCard(
-      {required this.icon,
-      required this.label,
-      required this.value,
-      required this.color,
-      required this.mobile});
+  const _ContactCard({
+    required this.icon,
+    required this.lbl,
+    required this.val,
+    required this.color,
+    required this.mobile,
+  });
   @override
   State<_ContactCard> createState() => _ContactCardState();
 }
@@ -1643,15 +1549,15 @@ class _ContactCardState extends State<_ContactCard> {
   bool _copied = false;
 
   void _open() {
-    if (widget.label == 'Email') {
-      js.context.callMethod('open', ['mailto:${widget.value}']);
+    if (widget.lbl == 'Email') {
+      js.context.callMethod('open', ['mailto:${widget.val}']);
     } else {
-      js.context.callMethod('open', [widget.value]);
+      js.context.callMethod('open', [widget.val]);
     }
   }
 
   void _copy() async {
-    await Clipboard.setData(ClipboardData(text: widget.value));
+    await Clipboard.setData(ClipboardData(text: widget.val));
     setState(() => _copied = true);
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copied = false);
@@ -1660,12 +1566,9 @@ class _ContactCardState extends State<_ContactCard> {
 
   @override
   Widget build(BuildContext context) {
-    final displayValue = widget.label == 'Email'
-        ? widget.value
-        : widget.value
-            .replaceFirst('https://', '')
-            .replaceFirst('www.', '')
-            .replaceFirst('wwww.', '');
+    final display = widget.lbl == 'Email'
+        ? widget.val
+        : widget.val.replaceFirst('https://', '').replaceFirst('www.', '');
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -1679,84 +1582,44 @@ class _ContactCardState extends State<_ContactCard> {
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: _hover ? C.cardHover : C.card,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
-                color: _hover ? widget.color.withOpacity(0.4) : C.border),
+                color: _hover ? widget.color.withOpacity(0.35) : C.border),
             boxShadow: _hover
                 ? [
                     BoxShadow(
-                        color: widget.color.withOpacity(0.12), blurRadius: 20)
+                        color: widget.color.withOpacity(0.08), blurRadius: 20)
                   ]
                 : [],
           ),
           child: Column(children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(11),
               decoration: BoxDecoration(
-                color: widget.color.withOpacity(0.1),
+                color: widget.color.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: widget.color.withOpacity(0.2)),
               ),
-              child: Icon(widget.icon, color: widget.color, size: 22),
+              child: Icon(widget.icon, color: widget.color, size: 20),
             ),
             const SizedBox(height: 12),
-            Text(widget.label, style: heading3().copyWith(fontSize: 15)),
+            Text(widget.lbl, style: h3().copyWith(fontSize: 14.5)),
             const SizedBox(height: 4),
-            Text(
-              displayValue,
-              style: mono(color: C.textMuted, size: 10),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            Text(display,
+                style: label(c: C.textMuted, sz: 10),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis),
             const SizedBox(height: 14),
-            // Open button
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: _hover ? widget.color.withOpacity(0.15) : C.bg,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                    color: _hover ? widget.color.withOpacity(0.4) : C.border),
-              ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.open_in_new_rounded,
-                    size: 13, color: _hover ? widget.color : C.textMuted),
-                const SizedBox(width: 6),
-                Text('Open',
-                    style: mono(
-                        color: _hover ? widget.color : C.textMuted, size: 11)),
-              ]),
-            ),
-            const SizedBox(height: 8),
-
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                _copy();
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                decoration: BoxDecoration(
-                  color: _copied ? widget.color.withOpacity(0.15) : C.bg,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                      color:
-                          _copied ? widget.color.withOpacity(0.4) : C.border),
-                ),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(_copied ? Icons.check_rounded : Icons.copy_rounded,
-                      size: 13, color: _copied ? widget.color : C.textMuted),
-                  const SizedBox(width: 6),
-                  Text(_copied ? 'Copied!' : 'Copy',
-                      style: mono(
-                          color: _copied ? widget.color : C.textMuted,
-                          size: 11)),
-                ]),
-              ),
+            _SmallBtn(
+                'Open', Icons.open_in_new_rounded, widget.color, _hover, _open),
+            const SizedBox(height: 7),
+            _SmallBtn(
+              _copied ? 'Copied!' : 'Copy',
+              _copied ? Icons.check_rounded : Icons.copy_rounded,
+              widget.color,
+              _copied,
+              _copy,
             ),
           ]),
         ),
@@ -1765,31 +1628,64 @@ class _ContactCardState extends State<_ContactCard> {
   }
 }
 
+class _SmallBtn extends StatelessWidget {
+  final String lbl;
+  final IconData icon;
+  final Color color;
+  final bool active;
+  final VoidCallback onTap;
+  const _SmallBtn(this.lbl, this.icon, this.color, this.active, this.onTap);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: active ? color.withOpacity(0.12) : C.bg,
+          borderRadius: BorderRadius.circular(8),
+          border:
+              Border.all(color: active ? color.withOpacity(0.35) : C.border),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 12, color: active ? color : C.textMuted),
+          const SizedBox(width: 6),
+          Text(lbl, style: label(c: active ? color : C.textMuted, sz: 11)),
+        ]),
+      ),
+    );
+  }
+}
+
+// ─── FOOTER ──────────────────────────────────────────────────────────────────
+
 class _Footer extends StatelessWidget {
   const _Footer();
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 28),
+      padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 26),
       decoration:
           BoxDecoration(border: Border(top: BorderSide(color: C.border))),
       child: Row(children: [
         Text.rich(TextSpan(children: [
           TextSpan(
               text: 'AO',
-              style: mono(color: C.accent, size: 14)
-                  .copyWith(fontWeight: FontWeight.w900)),
-          TextSpan(text: '.dev', style: mono(color: C.textDim, size: 12)),
+              style: label(sz: 14).copyWith(fontWeight: FontWeight.w900)),
+          TextSpan(text: '.dev', style: label(c: C.textDim, sz: 12)),
         ])),
         const Spacer(),
-        Text('Built with Flutter & ❤️',
-            style: mono(color: C.textDim, size: 11)),
+        Text('Built with Flutter & ❤️', style: label(c: C.textDim, sz: 11)),
         const Spacer(),
-        Text('© 2025 Aman Obaid', style: mono(color: C.textDim, size: 11)),
+        Text('© 2025 Aman Obaid', style: label(c: C.textDim, sz: 11)),
       ]),
     );
   }
 }
+
+// ─── SECTION LABEL ───────────────────────────────────────────────────────────
 
 class _SectionLabel extends StatelessWidget {
   final String text;
@@ -1798,15 +1694,15 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(width: 24, height: 1, color: C.accent),
+        Container(width: 22, height: 1, color: C.accent),
         const SizedBox(width: 10),
         Text(text.toUpperCase(),
-            style: mono(size: 11).copyWith(letterSpacing: 3)),
+            style: label(sz: 10.5).copyWith(letterSpacing: 3)),
         const SizedBox(width: 10),
-        Container(width: 24, height: 1, color: C.accent),
+        Container(width: 22, height: 1, color: C.accent),
       ]),
       const SizedBox(height: 10),
-      Text(text, style: heading2()),
+      Text(text, style: h2()),
     ]);
   }
 }
